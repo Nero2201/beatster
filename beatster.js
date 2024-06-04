@@ -131,9 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const youtubeLinkData = parseYoutubeLink(youtubeURL);
         if (youtubeLinkData) {
             qrScanner.stop(); // Stop scanning after a result is found
-            videoStream();
-            //document.getElementById('qr-reader').style.display = 'none'; // Hide the scanner after successful scan
-            //document.getElementById('cancelScanButton').style.display = 'none'; // Hide the cancel-button
+
             lastDecodedText = ""; // Reset the last decoded text
 
             document.getElementById('video-id').textContent = youtubeLinkData.videoId;  
