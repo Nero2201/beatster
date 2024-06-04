@@ -1,0 +1,149 @@
+:root {
+    --translationX: 0px;
+    --translationY: 0px;
+    --videoWidth: 100vw;
+    --videoHeight: 100vh;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #2d2d2d;
+    color: #333;
+    line-height: 1.6;
+    text-align: center;
+    margin:0;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    overflow: hidden;
+    padding: 0 20px;
+    
+}
+
+.header {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+}
+
+.settings_div {
+    position: absolute;
+    font-size: xx-large;
+    top : 15%;
+    bottom: 5%;
+    left: 5%;
+    right: 5%;
+    border-radius: 2em;
+    padding: 1%;
+    z-index: 10;
+    background-color: goldenrod;
+    box-shadow: 0 0 1em black;
+    visibility: hidden;
+
+}
+
+.scan-region-highlight {
+    translate: var(--translationX) var(--translationY);
+}
+
+#debug {
+    position: absolute;
+    /*visibility: hidden;*/
+}
+
+.preview {
+    width: 100vw;
+    overflow: hidden;
+    display: block;
+    height:100vh;
+    border-radius: 1em;
+}
+
+
+#qr-video {
+    z-index: -1;
+    width: var(--videoWidth);
+    height: var(--videoHeight);
+    translate: var(--translationX) var(--translationY);
+}
+.scan-region-highlight {
+    border-radius: 30px;
+    outline: rgba(0, 0, 0, .35) solid 50vmax;
+}
+video {
+    position: relative;
+    z-index: -1;
+}
+
+#playBackground {
+    background-color: darkgoldenrod;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    /*display: none;*/
+    box-shadow: inset #2d2d2d 0 0 5em;
+    position: absolute;
+}
+
+.button {
+    position: absolute;
+    background: goldenrod;
+    padding: 1em 1.2em;
+    border: none;
+    border-radius: 2em;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    size: 8em 8em;
+    z-index: 10;
+}
+
+.button:hover {
+    background: #ffcc00;
+}
+
+.button:active {
+    box-shadow: inset #2d2d2d 0 0 1em;
+}
+
+#startstop-video {
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    visibility: hidden;
+}
+
+#settingsButton {
+    top: 1em;
+    right: 1em;
+    z-index: 5;
+}
+
+#cancelScanButton {
+    top: 1em;
+    left: 1em;
+    z-index: 5;
+}
+
+#startScanButton {
+    top: 1em;
+    left: 50%;
+    translate: -50% 0;
+    z-index: 5;
+
+}
+
+button img {
+    width: 7em;
+    height: 7em;
+}
+
+#img-pp {
+    width: 41em;
+    height: 41em;
+}
+
