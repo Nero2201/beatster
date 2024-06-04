@@ -298,7 +298,7 @@ document.getElementById('cancelScanButton').addEventListener('click', function (
 });
 
 document.getElementById('startScanButton').addEventListener('click', function () {
-    stopQrScanner();
+    qrScanner.stop();
     startQrScanner();
 });
 
