@@ -7,6 +7,120 @@ let qrScanner;
 let csvCache = {};
 let showSettings = false;
 
+/* Youtube player */
+// This function creates an <iframe> (and YouTube player) after the API code downloads.
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+        height: '0',
+        width: '0',
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+        }
+    });
+}
+window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+
+// Load the YouTube IFrame API script
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+const firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+// The API will call this function when the video player is ready.
+function onPlayerReady(event) {
+    // Cue a video using the videoId from the QR code (example videoId used here)
+    // player.cueVideoById('dQw4w9WgXcQ');
+}
+
+// Display video information when it's cued
+function onPlayerStateChange(event) {
+    if (event.data == YT.PlayerState.CUED) {
+        document.getElementById('startstop-video').style.display = 'inline-block';
+        document.getElementById('startstop-video').style.background = "green";
+        // Display title and duration
+        var videoData = player.getVideoData();
+        document.getElementById('video-title').textContent = videoData.title;
+        var duration = player.getDuration();
+        document.getElementById('video-duration').textContent = formatDuration(duration);
+        // Check for Autoplay
+        if (document.getElementById('autoplay').checked == true) {
+            document.getElementById('startstop-video').innerHTML = "Stop";
+            if (document.getElementById('randomplayback').checked == true) {
+                playVideoAtRandomStartTime();
+            }
+            else {
+            player.playVideo();
+            }
+        }
+    }
+    else if (event.data == YT.PlayerState.PLAYING) {
+        document.getElementById('startstop-video').style.background = "red";
+    }
+    else if (event.data == YT.PlayerState.PAUSED | event.data == YT.PlayerState.ENDED) {
+        document.getElementById('startstop-video').style.background = "green";
+    }
+    else if (event.data == YT.PlayerState.BUFFERING) {
+        document.getElementById('startstop-video').style.background = "orange";
+    }
+}
+
+// Helper function to format duration from seconds to a more readable format
+function formatDuration(duration) {
+    var minutes = Math.floor(duration / 60);
+    var seconds = duration % 60;
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+}
+
+function playVideoAtRandomStartTime() {
+    const minStartPercentage = 0.10;
+    const maxEndPercentage = 0.90;
+    let videoDuration = player.getDuration()
+    let startTime = player.getCurrentTime(); // If the video is already cued to a specific start time
+    playbackDuration = parseInt(document.getElementById('playback-duration').value, 10) || 30;
+    let endTime = startTime + playbackDuration;
+
+    // Adjust start and end time based on video duration
+    const minStartTime = Math.max(startTime, videoDuration * minStartPercentage);
+    const maxEndTime = videoDuration * maxEndPercentage;
+
+    // Ensure the video ends by 90% of its total duration
+    if (endTime > maxEndTime) {
+        endTime = maxEndTime;
+        startTime = Math.max(minStartTime, endTime - playbackDuration);
+    }
+
+    // If custom start time is 0 or very close to the beginning, pick a random start time within the range
+    if (startTime <= minStartTime) {
+        const range = maxEndTime - minStartTime - playbackDuration;
+        const randomOffset = Math.random() * range;
+        startTime = minStartTime + randomOffset;
+        endTime = startTime + playbackDuration;
+    }
+
+    // Cue video at calculated start time and play
+    console.log("play random", startTime, endTime)
+    player.seekTo(startTime, true);
+    player.playVideo();
+
+    clearTimeout(playbackTimer); // Clear any existing timer
+    // Schedule video stop after the specified duration
+    playbackTimer = setTimeout(() => {
+        player.pauseVideo();
+        document.getElementById('startstop-video').innerHTML = "Play";
+    }, (endTime - startTime) * 1000); // Convert to milliseconds
+}
+
+
+
+
+
+
+
+
+
+
+
 window.addEventListener('resize', function(event) {
     adjustView();
 }, true);
@@ -134,11 +248,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             lastDecodedText = ""; // Reset the last decoded text
 
-            document.getElementById('video-id').textContent = youtubeLinkData.videoId;  
 
             console.log(youtubeLinkData.videoId);
             console.log("playing video");
-            player.cueVideoById(youtubeLinkData.videoId, youtubeLinkData.startTime || 0);   
+            player.cueVideoById(youtubeLinkData.videoId, youtubeLinkData.startTime || 0);
+               
             
         }
         
@@ -338,109 +452,7 @@ function adjustView() {
     }
 }
 
-/* Youtube player */
-// This function creates an <iframe> (and YouTube player) after the API code downloads.
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-        height: '0',
-        width: '0',
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-        }
-    });
-}
-window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 
-// Load the YouTube IFrame API script
-const tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-const firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-// The API will call this function when the video player is ready.
-function onPlayerReady(event) {
-    // Cue a video using the videoId from the QR code (example videoId used here)
-    // player.cueVideoById('dQw4w9WgXcQ');
-}
-
-// Display video information when it's cued
-function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.CUED) {
-        document.getElementById('startstop-video').style.display = 'inline-block';
-        document.getElementById('startstop-video').style.background = "green";
-        // Display title and duration
-        var videoData = player.getVideoData();
-        document.getElementById('video-title').textContent = videoData.title;
-        var duration = player.getDuration();
-        document.getElementById('video-duration').textContent = formatDuration(duration);
-        // Check for Autoplay
-        if (document.getElementById('autoplay').checked == true) {
-            document.getElementById('startstop-video').innerHTML = "Stop";
-            if (document.getElementById('randomplayback').checked == true) {
-                playVideoAtRandomStartTime();
-            }
-            else {
-            player.playVideo();
-            }
-        }
-    }
-    else if (event.data == YT.PlayerState.PLAYING) {
-        document.getElementById('startstop-video').style.background = "red";
-    }
-    else if (event.data == YT.PlayerState.PAUSED | event.data == YT.PlayerState.ENDED) {
-        document.getElementById('startstop-video').style.background = "green";
-    }
-    else if (event.data == YT.PlayerState.BUFFERING) {
-        document.getElementById('startstop-video').style.background = "orange";
-    }
-}
-
-// Helper function to format duration from seconds to a more readable format
-function formatDuration(duration) {
-    var minutes = Math.floor(duration / 60);
-    var seconds = duration % 60;
-    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
-}
-
-function playVideoAtRandomStartTime() {
-    const minStartPercentage = 0.10;
-    const maxEndPercentage = 0.90;
-    let videoDuration = player.getDuration()
-    let startTime = player.getCurrentTime(); // If the video is already cued to a specific start time
-    playbackDuration = parseInt(document.getElementById('playback-duration').value, 10) || 30;
-    let endTime = startTime + playbackDuration;
-
-    // Adjust start and end time based on video duration
-    const minStartTime = Math.max(startTime, videoDuration * minStartPercentage);
-    const maxEndTime = videoDuration * maxEndPercentage;
-
-    // Ensure the video ends by 90% of its total duration
-    if (endTime > maxEndTime) {
-        endTime = maxEndTime;
-        startTime = Math.max(minStartTime, endTime - playbackDuration);
-    }
-
-    // If custom start time is 0 or very close to the beginning, pick a random start time within the range
-    if (startTime <= minStartTime) {
-        const range = maxEndTime - minStartTime - playbackDuration;
-        const randomOffset = Math.random() * range;
-        startTime = minStartTime + randomOffset;
-        endTime = startTime + playbackDuration;
-    }
-
-    // Cue video at calculated start time and play
-    console.log("play random", startTime, endTime)
-    player.seekTo(startTime, true);
-    player.playVideo();
-
-    clearTimeout(playbackTimer); // Clear any existing timer
-    // Schedule video stop after the specified duration
-    playbackTimer = setTimeout(() => {
-        player.pauseVideo();
-        document.getElementById('startstop-video').innerHTML = "Play";
-    }, (endTime - startTime) * 1000); // Convert to milliseconds
-}
 
 
 /* Settings and cookies*/
