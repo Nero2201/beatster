@@ -11,8 +11,8 @@ let showSettings = false;
 // This function creates an <iframe> (and YouTube player) after the API code downloads.
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
-        height: '0',
-        width: '0',
+        height: '720',
+        width: '1280',
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
